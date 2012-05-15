@@ -1,3 +1,5 @@
+require "filename/version"
+
 class FileName
   class NameError < StandardError; end
   
@@ -50,7 +52,7 @@ class FileName
     Enumerator.new do |y|
       name = "#{chop}#{suffix}"
       loop {
-        y << [name, ext].join
+        y << FileName.new([name, ext].join, @sep)
         name = name.next
       }
     end
@@ -58,7 +60,7 @@ class FileName
 
   def self.join(items, sep=nil)
     sep = sep || File::SEPARATOR
-    items.join(sep).to_filename
+    new items.join(sep), sep
   end
 end
 
@@ -75,7 +77,7 @@ end
 if __FILE__ == $0
   fn = 'abc/hello/abc.rb'.to_filename
 
-  puts fn.each('00').take(10)
+  # puts fn.each('10').take(20).map(&:to_file)
 
   fn.dir # => "abc/hello"
   fn.basex # => "abc.rb"
@@ -86,7 +88,7 @@ if __FILE__ == $0
   fn2.chop # => abc
   fn.chop(2) # => abc
   fn.exist? # => true
-  fn.to_file # => #<File:abc/hello/abc.rb>
+  # fn.to_file # => #<File:abc/hello/abc.rb>
   fn.exist? # => true
   puts fn
   p FileName.join(%w(a b c.rb))
