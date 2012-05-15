@@ -31,12 +31,12 @@ class FileName
 end
 
 class String
-  def to_file
+  def to_filename
     FileName.new self
   end
 end
 
-fn = 'abc/hello/abc.rb'.to_file
+fn = 'abc/hello/abc.rb'.to_filename
 
 fn.dir # => "abc/hello"
 fn.basex # => "abc.rb"
