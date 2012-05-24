@@ -49,6 +49,11 @@ describe FileName do
       it "return extension name" do
         @fn.ext.should eql '.rb'
       end
+
+      it "return nil name without extension" do
+        fn = FileName.new '.hello'
+        fn.ext.should be_nil
+      end
     end
 
     context "split" do
@@ -81,6 +86,13 @@ describe FileName do
         fn = FileName.new ".hello/world"
         fn.chop.to_s.should eql ".hello"
       end
+
+      it "cuts extension if it exist" do
+        fn1 = FileName.new 'hello.rb'
+        fn2 = FileName.new 'hello'
+        fn1.chop_ext.should eql 'hello'
+        fn2.chop_ext.should eql 'hello'
+      end
     end
 
     context "exist?" do
@@ -104,8 +116,13 @@ describe FileName do
       end
 
       it "make 5 FileName objects with sequential names" do
-        fn = FileName.new('abc/def.rb')
-        fn.each.take(5).map(&:to_s).should eql ['abc/def.rb', 'abc/deg.rb', 'abc/deh.rb', 'abc/dei.rb', 'abc/dej.rb']
+        fn = FileName.new('abc/def/ghi.rb')
+        fn.each.take(5).map(&:to_s).should eql ['abc/def/ghi.rb', 'abc/def/ghj.rb', 'abc/def/ghk.rb', 'abc/def/ghl.rb', 'abc/def/ghm.rb']
+      end
+
+      it "make 5 FileName objects with sequential no-extension names" do
+        fn = FileName.new('abc/def/ghi')
+        fn.each.take(5).map(&:to_s).should eql ['abc/def/ghi', 'abc/def/ghj', 'abc/def/ghk', 'abc/def/ghl', 'abc/def/ghm']
       end
 
       it "make 5 FileName objects with sequential numbered names" do

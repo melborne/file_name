@@ -27,7 +27,7 @@ class FileName
   end
 
   def ext
-    File.extname(to_s)
+    File.extname(to_s).to_nil #return nil when extname is empty
   end
 
   def exto
@@ -39,10 +39,13 @@ class FileName
   end
 
   def chop(n=1)
-    ext = self.ext
-    name = self.to_s.sub(/#{ext}$/, '')
-    name = name.split('/').push(ext.to_nil).compact[0..-(n+1)].join(@sep)
+    name = chop_ext.split('/').push(ext).compact[0..-(n+1)].join(@sep)
     self.class.new name, sep:@sep, content:@content
+  end
+
+  def chop_ext
+    return self.to_s unless ext
+    self.to_s.sub(/#{ext}$/, '')
   end
 
   def exist?
@@ -62,7 +65,7 @@ class FileName
 
   def each(suffix=nil)
     Enumerator.new do |y|
-      name = "#{chop}#{suffix}"
+      name = "#{chop_ext}#{suffix}"
       loop {
         y << self.class.new([name, ext].join, sep:@sep, content:@content)
         name = name.next
