@@ -1,13 +1,16 @@
-require "filename/version"
+require_relative "filename/version"
 
 class FileName
   class NameError < StandardError; end
   
-  attr_reader :filename
+  attr_reader :filename, :sep
+  attr_accessor :content
   alias :to_s :filename
-  def initialize(str, sep=nil)
-    @sep = sep || File::SEPARATOR
-    raise NameError if str.end_with?(@sep)
+  def initialize(str, opt={})
+    opt = {sep: File::SEPARATOR, content: ''}.merge(opt)
+    @sep = opt[:sep]
+    raise NameError if str.end_with?(sep)
+    @content = opt[:content]
     @filename = str
   end
 
@@ -27,12 +30,19 @@ class FileName
     File.extname(to_s)
   end
 
+  def exto
+    ext.sub(/^\./, '')
+  end
+
   def split
     [dir, base, ext]
   end
 
   def chop(n=1)
-    to_s.split(@sep)[0..-(n+1)].join(@sep).to_filename(@sep)
+    ext = self.ext
+    name = self.to_s.sub(/#{ext}$/, '')
+    name = name.split('/').push(ext.to_nil).compact[0..-(n+1)].join(@sep)
+    self.class.new name, sep:@sep, content:@content
   end
 
   def exist?
@@ -43,8 +53,10 @@ class FileName
     File.new(to_s)
   rescue Errno::ENOENT
     require "fileutils"
-    Dir.exist?(dir) || FileUtils.mkdir_p(dir)
-    system("touch #{to_s}")
+    Dir.exists?(dir) || FileUtils.mkdir_p(dir)
+    File.open(to_s, 'w') do |f|
+      f.write content
+    end
     retry
   end
 
@@ -52,44 +64,27 @@ class FileName
     Enumerator.new do |y|
       name = "#{chop}#{suffix}"
       loop {
-        y << FileName.new([name, ext].join, @sep)
+        y << self.class.new([name, ext].join, sep:@sep, content:@content)
         name = name.next
       }
     end
   end
 
-  def self.join(items, sep=nil)
-    sep = sep || File::SEPARATOR
-    new items.join(sep), sep
+  def self.join(items, sep=File::SEPARATOR)
+    new items.join(sep), sep:sep
   end
 end
 
 class String
+  def to_nil
+    empty? ? nil : self
+  end
+
   def to_filename(sep=nil)
-    FileName.new self, sep
+    FileName.new self, sep:sep
   end
 
   def to_file(sep=nil)
     self.to_filename(sep).to_file
   end
-end
-
-if __FILE__ == $0
-  fn = 'abc/hello/abc.rb'.to_filename
-
-  # puts fn.each('10').take(20).map(&:to_file)
-
-  fn.dir # => "abc/hello"
-  fn.basex # => "abc.rb"
-  fn.base # => "abc"
-  fn.ext # => ".rb"
-  fn.split # => ["abc/hello", "abc", ".rb"]
-  fn2 = fn.chop # => abc/hello
-  fn2.chop # => abc
-  fn.chop(2) # => abc
-  fn.exist? # => true
-  # fn.to_file # => #<File:abc/hello/abc.rb>
-  fn.exist? # => true
-  puts fn
-  p FileName.join(%w(a b c.rb))
 end
