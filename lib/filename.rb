@@ -1,55 +1,52 @@
 require_relative "filename/version"
 
-class FileName
+module FileName
   class NameError < StandardError; end
   
   attr_reader :filename, :sep
   attr_accessor :content
   alias :to_s :filename
-  def initialize(str, opt={})
-    opt = {sep: File::SEPARATOR, content: ''}.merge(opt)
-    @sep = opt[:sep]
-    raise NameError if str.end_with?(sep)
-    @content = opt[:content]
-    @filename = str
-  end
-
-  def dir
+  def fdir
     File.dirname(to_s)
   end
 
-  def basex
+  def fbasex
     File.basename(to_s, '')
   end
 
-  def base(suffix='.*')
+  def fbase(suffix='.*')
     File.basename(to_s, suffix)
   end
 
-  def ext
+  def fext
     File.extname(to_s).to_nil #return nil when extname is empty
   end
 
-  def exto
+  def fexto
     ext.sub(/^\./, '')
   end
 
-  def split
-    [dir, base, ext]
+  def fsplit
+    [fdir, fbase, fext]
   end
 
-  def chop(n=1)
-    name = chop_ext.split('/').push(ext).compact[0..-(n+1)].join(@sep)
-    self.class.new name, sep:@sep, content:@content
+  def fchop(n=1)
+    sep = File::SEPARATOR
+    name = fchop_ext.split(sep).push(fext).compact[0..-(n+1)].join(sep)
+    self.class.new name
   end
 
-  def chop_ext
-    return self.to_s unless ext
-    self.to_s.sub(/#{ext}$/, '')
+  def fchop_ext
+    return self.to_s unless fext
+    self.to_s.sub(/#{fext}$/, '')
   end
 
-  def exist?
+  def fexist?
     File.exist?(to_s)
+  end
+
+  def fexpand(base='.')
+    File.expand_path(to_s, base)
   end
 
   def to_file
@@ -63,18 +60,35 @@ class FileName
     retry
   end
 
-  def each(suffix=nil)
-    Enumerator.new do |y|
-      name = "#{chop_ext}#{suffix}"
-      loop {
-        y << self.class.new([name, ext].join, sep:@sep, content:@content)
-        name = name.next
-      }
+  class FileName
+    include ::FileName
+    alias :dir :fdir
+    alias :base :fbase
+    alias :basex :fbasex
+    alias :ext :fext
+    alias :exto :fexto
+    alias :split :fsplit
+    alias :chop :fchop
+    alias :exist? :fexist?
+    alias :chop_ext :fchop_ext
+    alias :expand :fexpand
+    def initialize(str, opt={})
+      opt = {sep: File::SEPARATOR, content: ''}.merge(opt)
+      @sep = opt[:sep]
+      raise NameError if str.end_with?(sep)
+      @content = opt[:content]
+      @filename = str
     end
-  end
 
-  def self.join(items, sep=File::SEPARATOR)
-    new items.join(sep), sep:sep
+    def sequence(suffix=nil)
+      Enumerator.new do |y|
+        name = "#{chop_ext}#{suffix}"
+        loop {
+          y << self.class.new([name, ext].join, sep:@sep, content:@content)
+          name = name.next
+        }
+      end
+    end
   end
 end
 
@@ -83,11 +97,17 @@ class String
     empty? ? nil : self
   end
 
-  def to_filename(sep=nil)
-    FileName.new self, sep:sep
+  def to_filename
+    FileName::FileName.new self
   end
 
-  def to_file(sep=nil)
-    self.to_filename(sep).to_file
+  def to_file
+    to_filename.to_file
+  end
+end
+
+class Array
+  def fjoin
+    File.join(*self)
   end
 end
