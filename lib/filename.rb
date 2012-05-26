@@ -1,11 +1,9 @@
 require_relative "filename/version"
+autoload :FileUtils, "fileutils"
 
 module FileName
   class NameError < StandardError; end
   
-  attr_reader :filename, :sep
-  attr_accessor :content
-  alias :to_s :filename
   def fdir
     File.dirname(to_s)
   end
@@ -23,7 +21,7 @@ module FileName
   end
 
   def fexto
-    ext.sub(/^\./, '')
+    fext.sub(/^\./, '')
   end
 
   def fsplit
@@ -49,13 +47,17 @@ module FileName
     File.expand_path(to_s, base)
   end
 
-  def to_file
+  def to_filename(content='')
+    FileName.new to_s, content:content
+  end
+
+  def to_file(text='')
     File.new(to_s)
   rescue Errno::ENOENT
-    require "fileutils"
-    Dir.exists?(dir) || FileUtils.mkdir_p(dir)
+    Dir.exists?(fdir) || FileUtils.mkdir_p(fdir)
+    text = content if respond_to?(:content)
     File.open(to_s, 'w') do |f|
-      f.write content
+      f.write text
     end
     retry
   end
@@ -72,6 +74,9 @@ module FileName
     alias :exist? :fexist?
     alias :chop_ext :fchop_ext
     alias :expand :fexpand
+    attr_accessor :content
+    attr_reader :filename, :sep
+    alias :to_s :filename
     def initialize(str, opt={})
       opt = {sep: File::SEPARATOR, content: ''}.merge(opt)
       @sep = opt[:sep]
@@ -95,14 +100,6 @@ end
 class String
   def to_nil
     empty? ? nil : self
-  end
-
-  def to_filename
-    FileName::FileName.new self
-  end
-
-  def to_file
-    to_filename.to_file
   end
 end
 

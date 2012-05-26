@@ -108,9 +108,9 @@ describe FileName do
 
     context "expand" do
       it "return expand path" do
-        path = "spec/spec_helper.rb" 
+        path = "spec/spec_helper.rb"
         expand = File.expand_path(path)
-        path.fexpand.should eql expand
+        path.to_filename.expand.should eql expand
       end
     end
 
@@ -269,6 +269,49 @@ describe String do
     it "return expanded path with base dir" do
       expand = File.expand_path(@path, __FILE__)
       @path.fexpand(__FILE__).should eql expand
+    end
+  end
+
+  context "to_file" do
+    before(:each) do
+      require "fakefs/safe"
+      @path = "abc/ruby.rb"
+    end
+
+    it "create a file object with name of 'ruby.rb'" do
+      FakeFS do
+        f = @path.to_file
+        f.class.should eql File
+        File.basename(f).should eql 'ruby.rb'
+      end
+    end
+
+    it "save content of 'hello, world!'" do
+      FakeFS do
+        content = "hello, world!"
+        @path.to_file(content).read.should eql content
+      end
+    end
+  end
+
+  context "to_filename" do
+    it "create a filename object" do
+      @str.to_filename.class.should eql FileName::FileName
+    end
+
+    it "create a filename object which content is 'hello, world!'" do
+      str = 'hello, world!'
+      fn = @str.to_filename(str)
+      fn.content.should eql str
+    end
+  end
+end
+
+describe Array do
+  context "fjoin" do
+    it "return joined file path" do
+      path = %w(.. .. lib)
+      path.fjoin.should eql File.join(path)
     end
   end
 end
