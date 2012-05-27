@@ -173,6 +173,12 @@ describe FileName do
         end
       end
     end
+
+    context "to_dir" do
+      it "return file names like Dir#[]" do
+        '*'.to_filename.to_dir.should eql Dir['*']
+      end
+    end
   end
 end
 
@@ -303,6 +309,12 @@ describe String do
       str = 'hello, world!'
       fn = @str.to_filename(str)
       fn.content.should eql str
+    end
+  end
+
+  context "to_dir" do
+    it "return file names like Dir#[]" do
+      '*'.to_dir.should eql Dir['*']
     end
   end
 end

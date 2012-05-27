@@ -17,7 +17,8 @@ module FileName
   end
 
   def fext
-    File.extname(to_s).to_nil #return nil when extname is empty
+    ext = File.extname(to_s)
+    ext.empty? ? nil : ext
   end
 
   def fexto
@@ -48,6 +49,7 @@ module FileName
   end
 
   def to_filename(content='')
+    return self if is_a?(FileName)
     FileName.new to_s, content:content
   end
 
@@ -60,6 +62,10 @@ module FileName
       f.write text
     end
     retry
+  end
+
+  def to_dir
+    Dir[to_s]
   end
 
   class FileName
@@ -94,12 +100,6 @@ module FileName
         }
       end
     end
-  end
-end
-
-class String
-  def to_nil
-    empty? ? nil : self
   end
 end
 
