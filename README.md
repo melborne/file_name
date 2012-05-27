@@ -1,6 +1,6 @@
 # FileName
 
-FileName is a utility for handling filename strings which can be alternative of some File class methods.
+FileName is a module which can add functionality to string for handling filenames.
 
 ## Installation
 
@@ -17,87 +17,83 @@ Or install it yourself as:
     $ gem install filename
 
 ## Usage
-You can create FileName object with `FileName.new`.
+To include FileName module to String class, you can get several instance methods to manipulate filename strings.
+
+    String.send(:include, FileName)
+    
+    path = 'path/to/hello.rb'
+    
+    # get directory name
+    path.fdir # => "path/to"
+
+    # get file base name
+    path.fbase # => "hello"
+
+    # get file base name with extension
+    path.fbasex # => "hello.rb"
+
+    # get file extension
+    path.fext # => ".rb"
+
+    # get file extension without dot(.)
+    path.fexto # => "rb"
+
+    # split file directory, basename and extension
+    path.fsplit # => ["path/to", "hello", ".rb"]
+
+    # get file expand path
+    path.fexpand # => "/Users/melborne/filename/example/path/to/hello.rb"
+
+    # chop portion of path name recursively
+    path.fchop # => "path/to/hello"
+    path.fchop(2).fchop # => "path"
+    
+    # check file existance correnspond to a filename
+    path.fexist? # => false
+
+    # create a file object from filename object
+    path.to_file("puts 'Hello, Ruby!'") # => #<File:path/to/hello.rb>
+
+    # check file existance after file creation
+    path.fexist? # => true
+    File.open(path) do |f|
+      f.read # => "puts 'Hello, Ruby!'"
+    end
+
+You can also create FileName object with `FileName.new`, in which you can use above methods with omission of first 'f' from the name.
 
     require 'filename'
     
     path = 'path/to/hello.rb'
     
+    # create FileName object
     fn = FileName::FileName.new(path)
+
+    # to include FileName module to String, you can do it with string
+    fn = path.to_filename
     
     fn # => path/to/hello.rb
 
-    # get directory name
     fn.dir # => "path/to"
-
-    # get file base name
     fn.base # => "hello"
-
-    # get file base name with extension
     fn.basex # => "hello.rb"
-    
-    # get file extension
     fn.ext # => ".rb"
-    
-    # get file extension without dot(.)
     fn.exto # => "rb"
-
-    # split file directory, basename and extension
     fn.split # => ["path/to", "hello", ".rb"]
-
-    # get file expand path
     fn.expand # => "/Users/melborne/filename/example/path/to/hello.rb"
-    
-    # chop portion of path name recursively
-    fn.chop # => path/to/hello
-    fn.chop(2).chop # => path
     
     # set file content
     fn.content = "hello, world!"
+
+FileName has `sequence` method which produce sequencial names. This makes it easy to create sequencial dummy files or to rename disordered files to be ordered.
+
+    base = "path/to/hello.rb".to_filename
     
-    # check file existance correnspond to a filename
-    fn.exist? # => true
-
-    # create a file object from filename object
-    fn.to_file # => #<File:path/to/hello.rb>
-
-    # check file existance after file creation with to_file method
-    fn.exist? # => true
-    File.open(path) do |f|
-      f.read # => "hello, world!"
-    end
-
-You can produce sequencial file names with `FileName#sequence`.
-
-    # without argument, end character of the base name is incremented
-    fn.sequence.take(10) # => [path/to/hello.rb, path/to/hellp.rb, path/to/hellq.rb, path/to/hellr.rb, path/to/hells.rb, path/to/hellt.rb, path/to/hellu.rb, path/to/hellv.rb, path/to/hellw.rb, path/to/hellx.rb]
+    # without argument, the end character of the base name is incremented
+    base.sequence.take(5) # => [path/to/hello.rb, path/to/hellp.rb, path/to/hellq.rb, path/to/hellr.rb, path/to/hells.rb]
     
-    # with argument, it attach to the end of base name, then incremented
-    fn.sequence('00').take(10) # => [path/to/hello00.rb, path/to/hello01.rb, path/to/hello02.rb, path/to/hello03.rb, path/to/hello04.rb, path/to/hello05.rb, path/to/hello06.rb, path/to/hello07.rb, path/to/hello08.rb, path/to/hello09.rb]
-
-After include FileName Module to String class, you can use above instance methods to string object with prefix of `f`.
-
-    String.send(:include, FileName)
-    
-    path = 'path/to/goodbye.rb'
-    
-    path.fdir # => "path/to"
-    path.fbase # => "goodbye"
-    path.fbasex # => "goodbye.rb"
-    path.fext # => ".rb"
-    path.fexto # => "rb"
-    path.fsplit # => ["path/to", "goodbye", ".rb"]
-    path.fexpand # => "/Users/melborne/filename/example/path/to/goodbye.rb"
-
-    path.fchop # => "path/to/goodbye"
-    path.fchop(2).fchop # => "path"
-    
-    path.fexist? # => false
-    path.to_file('Goodbye!') # => #<File:path/to/goodbye.rb>
-    path.fexist? # => true
-    File.open(path) do |f|
-      f.read # => "Goodbye!"
-    end
+    # with argument, it will be attached to the end of the base name, then incremented
+    base.sequence('01').take(5) # => [path/to/hello01.rb, path/to/hello02.rb, path/to/hello03.rb, path/to/hello04.rb, path/to/hello05.rb]
 
 Also, `Array#fjoin` is provided.
 

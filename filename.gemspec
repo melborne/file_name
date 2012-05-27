@@ -4,8 +4,8 @@ require File.expand_path('../lib/filename/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["kyoendo"]
   gem.email         = ["postagie@gmail.com"]
-  gem.description   = %q{Utility for handling filename strings.}
-  gem.summary       = %q{FileName is a utility for handling filename strings which can be alternative of some File class methods. }
+  gem.description   = %q{add functionality to string for handling filenames.}
+  gem.summary       = %q{FileName is a module which can add functionality to string for handling filenames.}
   gem.homepage      = "https://github.com/melborne/filename"
 
   gem.files         = `git ls-files`.split($\)
