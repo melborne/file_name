@@ -1,6 +1,6 @@
 # FileName
 
-FileName is a utility for manipulating string as a filename.
+FileName is a utility for handling filename strings which can be alternative of some File class methods.
 
 ## Installation
 
