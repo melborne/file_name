@@ -64,8 +64,8 @@ module FileName
     retry
   end
 
-  def to_dir
-    Dir[to_s]
+  def to_dir(flags=0, &blk)
+    Dir.glob(to_s, flags, &blk)
   end
 
   class FileName

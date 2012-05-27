@@ -175,7 +175,7 @@ describe FileName do
     end
 
     context "to_dir" do
-      it "return file names like Dir#[]" do
+      it "return file names like Dir#glob" do
         '*'.to_filename.to_dir.should eql Dir['*']
       end
 
@@ -317,7 +317,7 @@ describe String do
   end
 
   context "to_dir" do
-    it "return file names like Dir#[]" do
+    it "return file names like Dir#glob" do
       '*'.to_dir.should eql Dir['*']
     end
 
