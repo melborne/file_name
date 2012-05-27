@@ -178,6 +178,10 @@ describe FileName do
       it "return file names like Dir#[]" do
         '*'.to_filename.to_dir.should eql Dir['*']
       end
+
+      it "return [] when pattern match failed" do
+        'no_such_path/*'.to_filename.to_dir.should be_empty
+      end
     end
   end
 end
@@ -315,6 +319,10 @@ describe String do
   context "to_dir" do
     it "return file names like Dir#[]" do
       '*'.to_dir.should eql Dir['*']
+    end
+
+    it "return [] when pattern match failed" do
+      'no_such_path/*'.to_filename.to_dir.should be_empty
     end
   end
 end
