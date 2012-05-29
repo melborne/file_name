@@ -6,7 +6,7 @@ FileName is a module which can add functionality to string for handling filename
 
 Add this line to your application's Gemfile:
 
-    gem 'filename'
+    gem 'file_name'
 
 And then execute:
 
@@ -14,10 +14,12 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install filename
+    $ gem install file_name
 
 ## Usage
 To include FileName module to String class, you can get several instance methods to manipulate filename strings.
+
+    require 'file_name'
 
     String.send(:include, FileName)
     
@@ -62,7 +64,7 @@ To include FileName module to String class, you can get several instance methods
 
 You can also create FileName object with `FileName.new`, in which you can use above methods with omission of first 'f' from the name.
 
-    require 'filename'
+    require 'file_name'
     
     path = 'path/to/hello.rb'
     
