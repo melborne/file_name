@@ -4,6 +4,7 @@ autoload :FileUtils, "fileutils"
 module FileName
   class NameError < StandardError; end
   
+  SEP = File::SEPARATOR
   def fdir
     File.dirname(to_s)
   end
@@ -30,8 +31,7 @@ module FileName
   end
 
   def fchop(n=1)
-    sep = File::SEPARATOR
-    name = fchop_ext.split(sep).push(fext).compact[0..-(n+1)].join(sep)
+    name = fchop_ext.split(SEP).push(fext).compact[0..-(n+1)].join(SEP)
     self.class.new name
   end
 
@@ -84,7 +84,7 @@ module FileName
     attr_reader :filename, :sep
     alias :to_s :filename
     def initialize(str, opt={})
-      opt = {sep: File::SEPARATOR, content: ''}.merge(opt)
+      opt = {sep: SEP, content: ''}.merge(opt)
       @sep = opt[:sep]
       raise NameError if str.end_with?(sep)
       @content = opt[:content]
