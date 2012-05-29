@@ -58,7 +58,7 @@ module FileName
   rescue Errno::ENOENT
     Dir.exists?(fdir) || FileUtils.mkdir_p(fdir)
     File.open(to_s, mode) do |f|
-      f.puts content if respond_to?(:content)
+      f.puts content if respond_to?(:content) && !content.empty?
       f.puts text if text
     end
     retry
