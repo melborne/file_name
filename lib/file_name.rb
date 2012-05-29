@@ -1,4 +1,4 @@
-require_relative "filename/version"
+require_relative "file_name/version"
 autoload :FileUtils, "fileutils"
 
 module FileName
@@ -9,7 +9,7 @@ module FileName
   end
 
   def fbasex
-    File.basename(to_s, '')
+    fbase('')
   end
 
   def fbase(suffix='.*')
