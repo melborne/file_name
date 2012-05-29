@@ -169,7 +169,9 @@ describe FileName do
 
       it "save content of 'hello, world!'" do
         FakeFS do
-          @fn.to_file.read.should eql "hello, world!"
+          File.open(@fn.to_s) do |f|
+            f.read.should eql "hello, world!\n"
+          end
         end
       end
     end
@@ -299,7 +301,9 @@ describe String do
     it "save content of 'hello, world!'" do
       FakeFS do
         content = "hello, world!"
-        @path.to_file(content).read.should eql content
+        @path.to_file(content) do |f|
+          f.read.should eql "#{content}\n"
+        end
       end
     end
   end

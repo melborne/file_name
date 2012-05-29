@@ -53,13 +53,13 @@ module FileName
     FileName.new to_s, content:content
   end
 
-  def to_file(text='')
-    File.new(to_s)
+  def to_file(text=nil, mode='w', perm=0666, &blk)
+    File.open(to_s, &blk)
   rescue Errno::ENOENT
     Dir.exists?(fdir) || FileUtils.mkdir_p(fdir)
-    text = content if respond_to?(:content)
-    File.open(to_s, 'w') do |f|
-      f.write text
+    File.open(to_s, mode) do |f|
+      f.puts content if respond_to?(:content)
+      f.puts text if text
     end
     retry
   end
